@@ -1,0 +1,46 @@
+service: reto-indra-rimac
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action: 
+        - dynamodb:*
+      Resource: 
+        - arn:aws:dynamodb:us-east-1:775989359387:table/clientsTable
+
+functions:
+  getClients:
+    handler: src/getClients.getClients
+    events:
+      - httpApi:
+          path: /clients
+          method: get
+  saveClient:
+    handler: src/saveClient.saveClient
+    events:
+      - httpApi:
+          path: /clients
+          method: post
+  getStarWarsCharacters:
+    handler: src/getStarWarsCharacters.getStarWarsCharacters
+    events:
+      - httpApi:
+          path: /swapi
+          method: get
+resources:
+  Resources:
+    clientsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: clientsTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
